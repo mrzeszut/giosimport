@@ -1,0 +1,30 @@
+Package: giosimport
+Type: Package
+Title: Pobieranie danych z portalu jakosci powietrza
+Version: 1.1.2
+Authors@R:
+    person("Mateusz", "Rzeszutek", email = "rzeszut@agh.edu.pl", role = c("aut", "cre"))
+Description: Pobiera i wczytuje baze danych o zanieczyszczeniach powietrza z 
+    serwisu www.powietrze.gios.gov.pl. Umożliwia utworzenie lokalnej plikowej 
+    bazy danych. Porządkuje stosowane w bazie danych nazewnictwo stacji oraz 
+    umożliwia interaktywne przegladanie metadanych na mapie. 
+Depends: R (>= 3.5.0)
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    dplyr,
+    janitor,
+    leaflet,
+    magrittr,
+    openxlsx,
+    purrr,
+    stringr,
+    tidyr,
+    lubridate
+RoxygenNote: 7.1.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    ggplot2,
+VignetteBuilder: knitr

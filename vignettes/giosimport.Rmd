@@ -1,0 +1,353 @@
+---
+title:  "Wprowadzenie do `giosimport`"
+date:   "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Wprowadzenie do gios_import}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  comment = "#>", 
+  echo = T, 
+  message = F, 
+  warning = F
+)
+```
+
+```{r dodatkowe ustawienia, include=FALSE, results='hide'}
+# By nie pobierać w kółko danych do kompilacji
+library(giosimport)
+getwd()
+load(file = "../R/sysdata.rda")
+```
+
+***
+
+**Mateusz Rzeszutek**
+
+**AGH** Akademia Górniczo-Hutnicza im. Stanisława Staszica w Krakowie, Wydział Geodezji Górniczej i Inżynierii Środowiska, Katedra Kształtowania i Ochrony Środowiska.
+
+**e-mail:** *[rzeszut@agh.edu.pl](rzeszut@agh.edu.pl)*.
+
+**lokalizacja:**  bud. C-4, p. V, pok. 511, al. A. Mickiewicza 30, Kraków, Polska.
+
+***
+# Kilka słów wprowadzenia
+***
+
+Na stronie [Portal Jakość Powietrza GIOŚ](http://powietrze.gios.gov.pl/pjp/home) udostepniana jest baza danych pomiarów stężeń zanieczyszczeń powietrza. Znajaduje się ona w zakładce [Bank Danych Pomiarowych](http://powietrze.gios.gov.pl/pjp/home). 
+
+Teoretycznie dane te mają jednorodną strukturę i ich wczytanie powinno być dość proste. Niestety w tych danych wielokrotnie pojawiają się różnego rodzaju nieścisłości, które uniemożliwiały stosowanie prostych i przejrzystych rozwiązań. Kod projektu stawał się bardzo długi, a spora jego część skupiała się na pozyskaniu danych i przekonwertowaniu ich do wygodnej formy pracy. Kilka najważniejszych problemów wymiennie tutaj:
+
+*	Pliki .xlsx przechowujące dane o pomiarach stężeń nie są jednorodne dla każdego roku. Posiadają różne nagłówki w zależności od roku. Stosowane są również różne separatory miejsc dziesiętnych, a w niektórych przypadkach dane numeric są traktowane jaki character, itd…
+*	pliki .xlsx podzielone są na stężenia 24-godzinne i 1-godzinne, co wymaga stosowania różnego formatowania daty.
+*	W wskazanym okresie zmienił się system nazwy stacji. W związku z tym w różnych latach będą stosowane różne oznaczenia stacji monitoringu jakości powietrza.
+*	Każdy folder zawiera różną liczbę plików.
+*	Każdy plik przechowuje informacje o stężeniach wybranego zanieczyszczenia powietrza dla różnej liczby stacji.
+
+
+Koniecznym było stworzenie jednorodnego zestawu funkcji pobierania i wczytywania danych, które zwracały będą spójne zestawy danych gotowy do dalszej obróbki np. oceny jakości powietrza, analiz wpływu czynników meteorologicznych na kształtowanie poziomów stężeń, czy dość skomplikowanego zagadnienia normalizacji meteorologicznej poziomów stężeń w celu oceny efektów działań naprawczych itd... 
+
+**Uwaga!!!:** Wszystkie kolumny oznaczone jako `date` odnoszą się do daty w [stefie UTC+01](https://pl.wikipedia.org/wiki/UTC%2B01:00). To rozwiązania sprawia, że dane są dość wygodne do łącznie z danymi meteorologicznymi. Natomiast może stwarzać to pewne problemy przy analizie wpływu czynników emisyjnych z uwagi na fakt, że w Polsce występuje czas letni **[UTC+01]** i zimowy **[UTC+02]**. Oznacza to, np. że tzw. szczyt natężenia ruchu będzie miał miejsce w innych godzinach doby w różnych okresach roku.
+
+***
+
+Przewodnik _"Wprowadzenie do gios_import"_ obrazuje metody pobierania i wczytywania danych z [Portalu Jakości Powietrza GIOŚ](http://powietrze.gios.gov.pl/pjp/home) przy pomocy pakietu **gios_import**, napisanego w języku programowania R. Przewodnik składa się z 3 części. 
+
+1. Pierwsza część skupia się na **metadanych**, które zawierają informacje o stacjach jakości poietrza. Pozwolą one w łatwy sposób odpowiedzieć użytkowniki na pytanie: _co znajduje się w bazie danych?_.
+
+2. Druga część opisuje jak pobrać całą **plikową bazę danych** na dysk przy pomocy języka programowania R. Zalecam pobranie od razu całej bazy danych na dysk, ponieważ funkcja wczytywania danych do R zakłada, że dane znajdują się na dysku.
+
+3. Trzecia część przedstawia funkcję **wczytywania danych**, która zakłada, że wykonałeś punkt 2, czyli posiadasz na dysku plikową bazę danych. 
+
+Opracowane funkcje tworzone były z myślą pętlach `map` z pakietu `purrr`. Dzięki czemu kod staje się przejrzysty i efektywny. Ponadto pakiet `purrr` został napisany w języku `C`, dzięki czemu działają one znacznie szybciej od klasycznych pętli `for` języka programowania R.
+
+
+***
+# Zainstaluj pakiet
+***
+
+Repozytorium pakietu znajduje się na portalu [github](https://github.com/). Zwiazku z tym potrzebny jest również pakiet `devtools`, który pobierze repozyroriu `giosimport` i zainstaluje pakiet na twoim komputerze.
+
+```{r setup, eval=FALSE}
+# devtools, sprawdzamy czy jest, jeśli nie to instalujemy i wczytujemy
+if(!require(devtools)) {install.packages("devtools"); require(devtools)}
+# instalcja pakietu gios_import
+devtools::install_github("mrzeszut/giosimport")
+library(giosimport)
+```
+
+Jeśli wszytko poszło dobrze to pakiet został zainstalowany. Jeśli pojawi się `error` to proszę o przesłanie komunikatu błędu na adres <rzeszut@agh.edu.pl>. Aktualnie jest to wersja `beta` pakietu.
+
+Poniższym polecenie wywoła w oknie pomocy listę funkcji pakietu, oraz ich skrócony opis. Możecie zauważyć, ze wrzystkie nazwy funkcji zaczynają się od wyrażenia `gios_`, dzięli czemu bardzo szybkow wyświetlają się w systemie podpowiedzi [Rstudio](https://rstudio.com/).
+
+```{r, eval=F}
+help(package = "giosimport")
+```
+
+Zalecam załadowanie dodatkowych pakietów z których korzystam w celu prezentacji wyników.
+
+```{r, results='hide'}
+library(dplyr)
+library(purrr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(leaflet)
+library(openxlsx)
+library(janitor)
+```
+
+
+***
+# 1. Metadane
+***
+
+Zanim zaczniemy korzystać z funkji pakietu `giosimport`, zalecam zdefiniowanie ścieżki dostępu do lokalizacji w której będą zapisywane dane w postaci bazy plikowej. Można ten krok pominąć i pobierać wszystkie dane do katalogu projektu, ale skutkować to będzie w przyszłości zapisywaniem wielokrotnym danych w różnych katalogach projektu. W moim przypadku jest to:
+
+```{r}
+kat_dost <- "D:/4_BAZY_DANYCH/gios_airbase" # zdefiniuj własną ścieżkę
+```
+
+Wczytywanie metadanych stacji jakości powietrza. Poniższa funkcja pobiera plik binarny do katalogu `kat_dost`. Następnie wczytuje dostępne w nim dane do obiektu `meta`. W systemie Windows koniecznym jest ustawienie argumentu `mode = "wb"`. W przypadku innych wersji systemu operacyjnego zachęcam zapoznać się z dokumentacją funkcji `download.file`. Jeśli korzytsasz z funkcji pierwszy raz, to ustaw `download = T`. Za każdym nastepnym uruchomieniem lepiej ustawić F, i wczytywać dane z dysku z lokalizacji `kat_dost`.
+
+```{r, eval=F}
+meta <- gios_metadane(type = "stacje", 
+                      download = F,    # zmień na T, jeśli uruchamiasz piewszy raz
+                      path = kat_dost, 
+                      mode = "wb")
+```
+```{r}
+dplyr::glimpse(meta)
+```
+
+Powyższa funkcja wczytała ramkę danych zawierającą podstawowe informacje o stacjach takie jak, kod stacji, typ i rodzaj stacji oraz identyfikujące lokalizacje stacji. W celu lepszego zorientowania się gdzie zlokalizowane są stacje, przygotowano funkcję `gios_vis`, którą generuję interaktywną mapę lokalizacji stacji. Każda stacja ma przypisaną etykietę w postaci kodu stacji.
+
+```{r, fig.width=7.25, fig.align='center', fig.height=6}
+gios_vis(data = meta %>% filter(is.na(data.zamkniecia))) # tylko aktywne stacje
+```
+
+**Uwaga!** Bank danych lokalnych z którego korzystamy jest aktualizowany raz w roku. Zwiazku z tym powyższa interaktywna mapa przedstawia stacje, które mierzyły poziomy stężeń zanieczyszczeń w powietrza w roku 2018. Jeśli są wam potrzebne bardziej aktualne dane, to można pozyskać je poprzez portal [Download of air quality data](http://discomap.eea.europa.eu/map/fme/AirQualityExport.htm). Myślę, że w niedługim czasie i tą bazę danych będzie obsługiwał ten pakiet. Natomiat moje doświadczenia z bazą danych EEA są dość niepokojące. Baza generuje często błędne pliki danych. Pliki z różnych lat mają odmienne kodowanie. Zdarzają sie pomyłki w danych np. rok 2016 jest przesunięty o jedną godzinę (tylko polska) itd... Niestety nie jest to najlepsze źródło danych, mimo że udostępniane są dane dla całej Europy. Dostępne są tylko dane od roku 2013.
+
+***
+
+**Stanowiska pomiarowe**
+
+Oprócz metadanych powyższa funkcja umożliwa pobranie danych o stanowiskach pomiarowych. Są to ważne dane, ponieważ zawierają informacje jakie substancje są mierzone na każdej stacji. W celu wczytania tych danych, wystarczy zmienić wartość argument `type = "stand`. 
+
+```{r, eval=F}
+stanowiska <- gios_metadane(type = "stanowiska", 
+                            download = F,  
+                            path = kat_dost, 
+                            mode = "wb")
+```
+```{r}
+dplyr::glimpse(stanowiska)
+```
+
+
+Załóżmy, że interesuje nas tylko jedna substancja tj. **PM10**, ale tylko dane pozyskiwane przy zastosowaniu metod **automatycznych**, a nie przy zastosowaniu metody grawimetrycznej. Dwa chcemy zobaczyć ile takich stacji jest w polsce za pmocą funkcji `gios_vis()`. Iteresują nas oczywiscie stacje aktywne.
+
+```{r, fig.width=7.25, fig.align='center', fig.height=6}
+# Zidentyfikujemy kody stacji dla które spełniają nasze warunki.
+identyfikacja <- stanowiska %>% 
+  filter(`wskaznik.-.kod` == "PM10") %>% 
+  filter(typ.pomiaru =="automatyczny") %>% 
+  pull(kod.stacji)
+
+# Teraz możemy przeprowadzić filtrowanie metadanych, a dane pzedstawić na mapie
+gios_vis(data = meta %>% 
+    filter(is.na(data.zamkniecia),             # tylko aktywne stacje
+           kod.stacji %in% identyfikacja))  # tylko PM10, automatyczne
+```
+
+***
+
+**Statystyki podstawowe**
+
+Oprócz metadanych, za pomocą `gios_metadane` można pozyskać plik statystyk za lata 2000-2018. W pliku znajdują sie wszystkie niezbędne miary statystyczne potrzebne do przeprowadzenia oceny jakości powietrza w strefach. W tym przypadku obiektem wyjściowym jest lista zawierajace ramkę danych dla każdej substancji. 
+
+```{r, eval=F}
+statystyki <- gios_metadane(type = "statystyki", 
+                            download = F, 
+                            path = kat_dost, 
+                            mode = "wb")
+```
+```{r}
+names(statystyki) # nazwy substancji
+statystyki[["PM10"]] %>% glimpse() # podgląd
+```
+
+
+Dane można łątwo wizualizować z pomocą pakietu `ggplot2` w celu zapoznania się interesujacymi danymi. Naprzykład wyselekconujemy stężenia średnioroczne pyłu zawieszonego PM10 obliczone na podstawie danych pozyskanych przy zastosowaniu metody grawimetrycznej.  
+
+```{r, fig.align='center', fig.height=6, fig.width=7.25}
+statystyki[["PM10"]] %>%
+  filter(Czas.uśredniania == "24g", 
+         Nazwa.strefy == "Aglomeracja Warszawska") %>% 
+  ggplot(., aes(x = Rok, 
+                y = Średnia, 
+                fill = Kod.stacji),
+         color = "black") +
+  geom_col(position = position_dodge2(0.2)) + 
+  facet_wrap(~Kod.stacji) + 
+  theme_bw() + 
+  theme(legend.position = "top", 
+        legend.direction = "horizontal") +
+  labs(x = openair::quickText("Średnie roczne stężenie pyłu zawieszonego PM10 [ug/m3]"),
+       fill = "kod")
+```
+
+***
+# 2. Pobieranie plikowej bazy danych 
+***
+
+Funkcję `gios_dowload` opisaną w tym rozdziale można zastosować tylko raz pobierając całą plikową bazę danych jednym poleceniem. Funkcja pobiera archiwum plików zawarte w Banku danych lokalnych portalu <powietrze.gios.gov.pl>. 
+
+Głównymi argumentami funkcji są `url` oraz `rok`. Wartości tych argumentów przedstawia poniższa tabela, która jest zapisana w pakiecie jako obiekt `zrodlo`.
+
+```{r}
+zrodlo %>% 
+  knitr::kable()
+```
+
+Poniższy przykład obrazuje, jak pobrać dane dla wybranego roku, w tym przypadku `2010 r`. Gdzie `11` to indeksy wiersza, a indeksy `1` i `2` oznaczają kolumny obiektu `zrodlo`.
+
+```{r, eval=F}
+pliki_2010 <- gios_download(url = zrodlo[11,1], 
+                            rok = zrodlo[11,2], 
+                            path = kat_dost, 
+                            mode = "wb") # mode - patrz dokumentacja funkcji
+```
+
+Teraz możesz sprawdzić katalog `kat_dost` i zauważysz, że pojawił się tam folder o nazwie `2011` przechowujący plikową bazę danych o stężeniach zanieczyszczeń powietrza w Polsce. Utworzyliśmy również obiekt wyjściowy, którym jest wektor `pliki_2000`. Zawiera on listę nazw plików znajdujących się w folderze `2011` w `kat_dost`.
+
+```{r}
+pliki_2010
+```
+
+Nazewnictwo plików jest jednorodne w całej bazie danych. Zaczyna się od roku, następnie nazwa substancji i czas uśredniania wyników. Powyższy obiekt może posłużyć do wczytania bazy danych, o czym napiszę więcej w rozdziale nr 3.
+
+
+***
+
+Możemy od razu pobrać całą plikową bazę danych jednym poleceniem. **Może to jednak chwilę potrwać**. Zależy od szybkości transferu danych. Rozpakowane pliki zajmują **630 MB**. Dobrze jest sprawdzić, czy macie tyle wolnego miejsca w lokalizacji `kat_dost`.
+
+**Zalecam pobranie całej bazy danych**. Napisana w dalszym rozdziale funkcja zakłada, że pozyskaliśmy pełną bazę danych i znajduje się ona na naszym dysku w folderze `kat_dost`. Ponadto pozyskując całą bazę danych nie będziemy musieli robić tego ponowanie.
+
+Zastosowana poniżej fukcja `map2()` jest pętlą która wykonuje polecenie dla kolejnych argumentów funkcji `gios_downland()`. W poniższym przykładzie argumentami funkcji są odpowiednio `.x = url`, i `.y = rok`. Czyli za `.x` podstawiamy listę adresów `url`, które dostępne są w obiekcie `zrodlo[,2]`, a za `.y` podstawiamy argument `rok`, który dostępnmy jest w obiekcie `żródlo[,2]`, pozostałe arguemnty są stałe. Wiecej u rodzie funkcji `map` z pakietu `purrr` znajdziecie w książe [R for data scince](https://r4ds.had.co.nz/) lub na stronie projektu [purrr](https://purrr.tidyverse.org/index.html)
+
+
+```{r, eval=F}
+pliki_all <- map2(.x = as.list(zrodlo[,1]), 
+                  .y = as.list(zrodlo[,2]), 
+                  .f = gios_download, 
+                  path = kat_dost,
+                  mode = "wb")
+```
+
+Po wykonaniu powyższego polecenia w lokalizacji `kat_dost` znajduje sie cała plikowa baza danych składająca się z 19 folderów. Kazdy folder dla jednego roku kalendarzowego. 
+
+W obiekcie `pliki_all` znajduje sie lista plików. Dobrym pomysłem jest uzupełnić nazwy poszczególnych elementów listy. Takie rozwiazanie pozwala nam odwoływać po indeksie `rok`, do każdego elementu listy. 
+
+```{r}
+names(pliki_all) <- paste0("R",zrodlo[,2])
+names(pliki_all)
+pliki_all["R2016"]
+```
+
+Nie trudno zauważyc, że lista plików skłąda się z dwóch typów danych. Część plików to dane 1-godzinne, a druga część plików to dane 24-godzinne. Należy pamiętąć, że czas usredniania wyników wynika z stosowanej metody pomiarowej. Dane średniodobe nie są wartościami średnimi obliczonymi na podstawie danych 1-godzinnych. 
+
+***
+# 3. Wczytywanie i porządkowanie danych
+***
+
+Napisana poniżej funkcja zakłada, że dane `1g` i `24g` będą wczytywane niezależnie. Sprawdzimy działanie naszej funkcji wczytując arkusz zawierającyy informacje stężenia średniodobowych `PM10`. W powyższym zestawie danych będą dla tych samych lokalizacji dostępne zarówno dane 1-g o 24-g dla pyłów zawieszonych i pyłów PM10.
+
+```{r, eval=T}
+pm10_2010 <- gios_read(nazwa = "2019_PM10_24g.xlsx",
+                       czas_mu = "24g", 
+                       path = kat_dost)
+```
+```{r}
+pm10_2010
+```
+
+Przy pomocy powyższej funkcji możemy wczytać wszystkie dane 1-godzinne lub 24-godzinne za pomocą pętli `map_df()`. Najpierw jednak musimy zdefiniować listę plików, którą chcemy wczytać. Funkcja `str_detect()` wykrywa tylko te pliki, które posiadają w nazwie człon `24g`.
+
+```{r, eval=T}
+n_data <-  map_df(.x =  pliki_2010[str_detect(pliki_2010, "24g")], 
+                  .f = gios_read, 
+                  czas_mu = "24g",
+                  path = kat_dost)
+```
+
+Teraz zmienimy układ danych na szeroki, tak by stężenia każdej substancji znajdowały się w osobnej kolumnie. Taki ukłąd jest bardzo wygodny w przypadku wykonywania analizy danych z pakietem `openair`.
+
+```{r, eval=T}
+n_data <- n_data %>% 
+  spread(key = sub, value = obs)
+```
+```{r}
+n_data
+```
+
+***
+
+Z reguły pojedyńczy zestaw danych dla wybranego roku to za mało. Gdy interesują nas realacje zachodzące pomiedzy poszczególnymi danymi potrzebujemy danych z znacznie dłuzszego okresu czasu.
+
+W obiekcie pliki_all znajdują się nazwy wszystkich plików zawartych w bazie danych. Najpierw wykonamy filtorwanie nazw plików, które chcemy wczytać, a następnie wczytamy dane.
+
+```{r, eval=T}
+inp_pm10_1 <- map(.x = pliki_all, 
+                  .f = ~ .[str_detect(., pattern = "PM10_1g")]) %>% 
+  flatten_chr() 
+
+inp_pm10_1 # podgląd listy
+
+PM10 <- map_df(.x = inp_pm10_1, 
+               .f = gios_read, 
+               czas_mu = "1g", 
+               path = kat_dost)
+```
+```{r}
+PM10 %>% head()
+PM10 %>% tail()
+```
+
+Opracowana funkcja nie identyfikuje starych i nowych kodów stacji. Wprowadzenie takiego rozwiązania wiazało by się z każdorazowym wczytywanie metadanych, co znacząco wydłużyło by działanie funkcji w trakcie wczytywania wielu plików. Ponadto operacje uzgodnienia są potrzebne tylko w przypadku pobierania wieloletniego szeregu czasowego danych. W przyapdku pobrania danych z jednego roku stosowane nazwy będą jednorodne i nie wymagają modyfikacji.
+
+W celu zrozumienia problemu wykonamy prosty przykład. Sprawdzimy `kod.stacji` zlokalizowanych w Krakowie.
+
+```{r}
+test <- unique(PM10$kod)
+test[str_detect(test, "MpKrak")]
+```
+
+Nie trudno zauważyć, że niektóre stacje zlokalizowane na terenie Aglomeracji Krakowskiej mają po dwie nazwy. Nowe kody zostały wprowadzone w 2015 roku i nie pokrywają się z nazwami poprzednich. Ponadto niektóre stacje na których nie jest już prowadzony monitoring nie mają przypisanych nowych kodów. 
+
+W celu wyelminowania tego problemy napisano funkcje `gios_kody`, która uzgadania nazewnictwo kodow stacji.
+
+```{r}
+PM10n <- gios_kody(data = PM10, meta = meta)
+```
+
+Porównajmy kody stacji:
+
+```{r}
+unique(PM10$kod) %>% .[str_detect(., "MpKrak")]  # poprzednie
+unique(PM10n$kod) %>% .[str_detect(., "MpKrak")] # jednorodne
+```
+
+***
+
+**Dotarłes do końca, gratuluję i pozdrawiam**
+
+***
+
+
