@@ -19,8 +19,6 @@
 
 gios_vis <- function(data = meta) {
 
-    a <- getwd()
-
     pal <- colorFactor(palette = c("blue", "red", "darkgreen"),
                        domain = c("tło", "komunikacyjna", "przemysłowa"))
 
@@ -50,5 +48,4 @@ gios_vis <- function(data = meta) {
                 labels = c("tło", "przemysłowa", "komunikacyjna"),
                 opacity = 1)
 
-    setwd(a)
 }

@@ -2,6 +2,8 @@
 # [1] Tworzymy listę linków pobierania danych. --------------------------------
 ###-------------------------------------------------------------------------###
 # Może wymagać aktualizacji.
+library(devtools)
+use_git()
 
 zrodlo <- data.frame(link = c(paste0("http://powietrze.gios.gov.pl/pjp/archives/downloadFile/",
                             c(223, 224, 225, 226, 202, 203, 227, 228, 229, 230,
