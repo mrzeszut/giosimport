@@ -1,4 +1,4 @@
-#' Korekta starych nazw stacji
+#' Korekta starych nazw stacji jakosci powietrza
 #'
 #' Funkcja identyfikuje stare kody stacji jakosci powietrza w wczytanych danych
 #' - \code{\link{gios_read}}. Nastepnie zamienia je na nowe kody stacji.
