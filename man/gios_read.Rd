@@ -32,7 +32,7 @@ pliki <- gios_download(url = zrodlo[1,1],
                        path = "",
                        mode = "wb")
 
-# Wczytanie danych o stÄ™ĹĽeniach Ĺ›redniodobowych PM10
+# Wczytanie danych o stężeniach średniodobowych PM10
 pm10 <- gios_read(nazwa = pliki[5],
                   czas_mu = "24h",
                   path =  "")

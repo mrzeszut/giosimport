@@ -248,6 +248,7 @@ save(meta,
      pliki_all,
      pliki_2020, file = "R/sysdata.rda")
 
-
+library(devtools)
+document()
 check()
 install()

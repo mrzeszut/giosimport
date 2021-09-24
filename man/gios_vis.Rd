@@ -19,11 +19,11 @@ stacji ze wzgledu na źródło odziaływania. Wyświetla kod stacji, co pozwala 
 łatwy sposób identyfikować intersujące nas dane pomiarowe.
 }
 \examples{
-# Pobranie pliku metadanych stacji jakoĹ›ci powietrza do katalogu projektu.
+# Pobranie pliku metadanych stacji jakości powietrza do katalogu projektu.
 meta <- gios_metadane(type = "meta",
                       download = T,
                       path = "",
                       metod = "wb")
-# wyĹ›wietlenie metadanych
+# wyświetlenie metadanych
 gios_vis(data = meta \%>\% filter(status == "aktywny"))
 }

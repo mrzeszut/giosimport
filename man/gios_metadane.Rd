@@ -33,7 +33,7 @@ obiektów \code{\link[tibble]{tibble}}, które mają różną ilość kolumn,
 ponieważ dla każdej substancji liczone są inne staystyki opisowe.
 }
 \examples{
-# Pobranie pliku metadanych stacji jakoĹ›ci powietrza do katalogu projektu.
+# Pobranie pliku metadanych stacji jakości powietrza do katalogu projektu.
 meatadane <- gios_metadane(type = "stacje",
                            download = T,
                            path = "",
