@@ -219,8 +219,8 @@ zrodlo %>%
 Poniższy przykład obrazuje, jak pobrać dane dla wybranego roku, w tym przypadku `2010 r`. Gdzie `11` to indeksy wiersza, a indeksy `1` i `2` oznaczają kolumny obiektu `zrodlo`.
 
 ```{r, eval=F}
-pliki_2010 <- gios_download(url = zrodlo[11,1], 
-                            rok = zrodlo[11,2], 
+pliki_2020 <- gios_download(url = zrodlo[21,1], 
+                            rok = zrodlo[21,2], 
                             path = kat_dost, 
                             mode = "wb") # mode - patrz dokumentacja funkcji
 ```
@@ -228,19 +228,40 @@ pliki_2010 <- gios_download(url = zrodlo[11,1],
 Teraz możesz sprawdzić katalog `kat_dost` i zauważysz, że pojawił się tam folder o nazwie `2011` przechowujący plikową bazę danych o stężeniach zanieczyszczeń powietrza w Polsce. Utworzyliśmy również obiekt wyjściowy, którym jest wektor `pliki_2000`. Zawiera on listę nazw plików znajdujących się w folderze `2011` w `kat_dost`.
 
 ```{r}
-pliki_2010
+pliki_2020
 ```
 
-Nazewnictwo plików jest jednorodne w całej bazie danych. Zaczyna się od roku, następnie nazwa substancji i czas uśredniania wyników. Powyższy obiekt może posłużyć do wczytania bazy danych, o czym napiszę więcej w rozdziale nr 3.
+Nazewnictwo plików jest jednorodne w całej bazie danych. Zaczyna się od roku,
+następnie nazwa substancji i czas uśredniania wyników. Powyższy obiekt może
+posłużyć do wczytania bazy danych, o czym napiszę więcej w rozdziale nr 3.
 
+Wektor pliki, możomy utworzyć w dowolnym momencie. Nie musimy pobierać drugi raz
+bazy dnaych, by utworzyć ten plik.
+
+```{r, eval=FALSE}
+pliki_2020 <- dir(paste0(kat_dost, "/2020"))
+```
 
 ***
 
-Możemy od razu pobrać całą plikową bazę danych jednym poleceniem. **Może to jednak chwilę potrwać**. Zależy od szybkości transferu danych. Rozpakowane pliki zajmują **630 MB**. Dobrze jest sprawdzić, czy macie tyle wolnego miejsca w lokalizacji `kat_dost`.
+Możemy od razu pobrać całą plikową bazę danych jednym poleceniem. **Może to
+jednak chwilę potrwać**. Zależy od szybkości transferu danych. Rozpakowane pliki
+zajmują **630 MB**. Dobrze jest sprawdzić, czy macie tyle wolnego miejsca w
+lokalizacji `kat_dost`.
 
-**Zalecam pobranie całej bazy danych**. Napisana w dalszym rozdziale funkcja zakłada, że pozyskaliśmy pełną bazę danych i znajduje się ona na naszym dysku w folderze `kat_dost`. Ponadto pozyskując całą bazę danych nie będziemy musieli robić tego ponowanie.
+**Zalecam pobranie całej bazy danych**. Napisana w dalszym rozdziale funkcja
+zakłada, że pozyskaliśmy pełną bazę danych i znajduje się ona na naszym dysku w
+folderze `kat_dost`. Ponadto pozyskując całą bazę danych nie będziemy musieli
+robić tego ponowanie.
 
-Zastosowana poniżej fukcja `map2()` jest pętlą która wykonuje polecenie dla kolejnych argumentów funkcji `gios_downland()`. W poniższym przykładzie argumentami funkcji są odpowiednio `.x = url`, i `.y = rok`. Czyli za `.x` podstawiamy listę adresów `url`, które dostępne są w obiekcie `zrodlo[,2]`, a za `.y` podstawiamy argument `rok`, który dostępnmy jest w obiekcie `żródlo[,2]`, pozostałe arguemnty są stałe. Wiecej u rodzie funkcji `map` z pakietu `purrr` znajdziecie w książe [R for data scince](https://r4ds.had.co.nz/) lub na stronie projektu [purrr](https://purrr.tidyverse.org/index.html)
+Zastosowana poniżej fukcja `map2()` jest pętlą która wykonuje polecenie dla
+kolejnych argumentów funkcji `gios_downland()`. W poniższym przykładzie
+argumentami funkcji są odpowiednio `.x = url`, i `.y = rok`. Czyli za `.x`
+podstawiamy listę adresów `url`, które dostępne są w obiekcie `zrodlo[,2]`, a za
+`.y` podstawiamy argument `rok`, który dostępnmy jest w obiekcie `żródlo[,2]`,
+pozostałe arguemnty są stałe. Wiecej u rodzie funkcji `map` z pakietu `purrr`
+znajdziecie w książe [R for data scince](https://r4ds.had.co.nz/) lub na stronie
+projektu [purrr](https://purrr.tidyverse.org/index.html)
 
 
 ```{r, eval=F}
@@ -253,7 +274,19 @@ pliki_all <- map2(.x = as.list(zrodlo[,1]),
 
 Po wykonaniu powyższego polecenia w lokalizacji `kat_dost` znajduje sie cała plikowa baza danych składająca się z 19 folderów. Kazdy folder dla jednego roku kalendarzowego. 
 
+Jeśli mamy już pobraną bazę danych, a chcemy utworzyć plik nazw plików danych, to można zrobić to prostym poleceniem.
+
+```{r, eval=F}
+wek <- 2000:2020 %>% 
+  as.character() %>% 
+  paste0(kat_dost, "/", .)
+
+pliki_all <- map(.x = wek, 
+                 .f = dir)
+```
+
 W obiekcie `pliki_all` znajduje sie lista plików. Dobrym pomysłem jest uzupełnić nazwy poszczególnych elementów listy. Takie rozwiazanie pozwala nam odwoływać po indeksie `rok`, do każdego elementu listy. 
+
 
 ```{r}
 names(pliki_all) <- paste0("R",zrodlo[,2])
@@ -270,18 +303,18 @@ Nie trudno zauważyc, że lista plików skłąda się z dwóch typów danych. Cz
 Napisana poniżej funkcja zakłada, że dane `1g` i `24g` będą wczytywane niezależnie. Sprawdzimy działanie naszej funkcji wczytując arkusz zawierającyy informacje stężenia średniodobowych `PM10`. W powyższym zestawie danych będą dla tych samych lokalizacji dostępne zarówno dane 1-g o 24-g dla pyłów zawieszonych i pyłów PM10.
 
 ```{r, eval=T}
-pm10_2010 <- gios_read(nazwa = "2019_PM10_24g.xlsx",
+pm10_2020 <- gios_read(nazwa = "2020_PM10_24g.xlsx",
                        czas_mu = "24g", 
                        path = kat_dost)
 ```
 ```{r}
-pm10_2010
+pm10_2020
 ```
 
 Przy pomocy powyższej funkcji możemy wczytać wszystkie dane 1-godzinne lub 24-godzinne za pomocą pętli `map_df()`. Najpierw jednak musimy zdefiniować listę plików, którą chcemy wczytać. Funkcja `str_detect()` wykrywa tylko te pliki, które posiadają w nazwie człon `24g`.
 
 ```{r, eval=T}
-n_data <-  map_df(.x =  pliki_2010[str_detect(pliki_2010, "24g")], 
+n_data <-  map_df(.x =  pliki_2020[str_detect(pliki_2020, "24g")], 
                   .f = gios_read, 
                   czas_mu = "24g",
                   path = kat_dost)
@@ -294,7 +327,7 @@ n_data <- n_data %>%
   spread(key = sub, value = obs)
 ```
 ```{r}
-n_data
+n_data %>% select(kod, date, SO2, NO2, PM10, PM2.5)
 ```
 
 ***
@@ -304,13 +337,13 @@ Z reguły pojedyńczy zestaw danych dla wybranego roku to za mało. Gdy interesu
 W obiekcie pliki_all znajdują się nazwy wszystkich plików zawartych w bazie danych. Najpierw wykonamy filtorwanie nazw plików, które chcemy wczytać, a następnie wczytamy dane.
 
 ```{r, eval=T}
-inp_pm10_1 <- map(.x = pliki_all, 
-                  .f = ~ .[str_detect(., pattern = "PM10_1g")]) %>% 
+pliki_1h_pm10 <- map(.x = pliki_all, 
+                    .f = ~ .[str_detect(., pattern = "PM10_1g")]) %>% 
   flatten_chr() 
 
-inp_pm10_1 # podgląd listy
+pliki_1h_pm10 # podgląd listy
 
-PM10 <- map_df(.x = inp_pm10_1, 
+PM10 <- map_df(.x = pliki_1h_pm10, 
                .f = gios_read, 
                czas_mu = "1g", 
                path = kat_dost)
@@ -320,18 +353,28 @@ PM10 %>% head()
 PM10 %>% tail()
 ```
 
-Opracowana funkcja nie identyfikuje starych i nowych kodów stacji. Wprowadzenie takiego rozwiązania wiazało by się z każdorazowym wczytywanie metadanych, co znacząco wydłużyło by działanie funkcji w trakcie wczytywania wielu plików. Ponadto operacje uzgodnienia są potrzebne tylko w przypadku pobierania wieloletniego szeregu czasowego danych. W przyapdku pobrania danych z jednego roku stosowane nazwy będą jednorodne i nie wymagają modyfikacji.
+Opracowana funkcja nie identyfikuje starych i nowych kodów stacji. Wprowadzenie
+takiego rozwiązania wiazało by się z każdorazowym wczytywanie metadanych, co
+znacząco wydłużyło by działanie funkcji w trakcie wczytywania wielu plików.
+Ponadto operacje uzgodnienia są potrzebne tylko w przypadku pobierania
+wieloletniego szeregu czasowego danych. W przyapdku pobrania danych z jednego
+roku stosowane nazwy będą jednorodne i nie wymagają modyfikacji.
 
-W celu zrozumienia problemu wykonamy prosty przykład. Sprawdzimy `kod.stacji` zlokalizowanych w Krakowie.
+W celu zrozumienia problemu wykonamy prosty przykład. Sprawdzimy `kod.stacji`
+zlokalizowanych w Krakowie.
 
 ```{r}
 test <- unique(PM10$kod)
 test[str_detect(test, "MpKrak")]
 ```
 
-Nie trudno zauważyć, że niektóre stacje zlokalizowane na terenie Aglomeracji Krakowskiej mają po dwie nazwy. Nowe kody zostały wprowadzone w 2015 roku i nie pokrywają się z nazwami poprzednich. Ponadto niektóre stacje na których nie jest już prowadzony monitoring nie mają przypisanych nowych kodów. 
+Nie trudno zauważyć, że niektóre stacje zlokalizowane na terenie Aglomeracji
+Krakowskiej mają po dwie nazwy. Nowe kody zostały wprowadzone w 2015 roku i nie
+pokrywają się z nazwami poprzednich. Ponadto niektóre stacje na których nie jest
+już prowadzony monitoring nie mają przypisanych nowych kodów.
 
-W celu wyelminowania tego problemy napisano funkcje `gios_kody`, która uzgadania nazewnictwo kodow stacji.
+W celu wyelminowania tego problemy napisano funkcje `gios_kody`, która uzgadania
+nazewnictwo kodow stacji.
 
 ```{r}
 PM10n <- gios_kody(data = PM10, meta = meta)
@@ -343,6 +386,9 @@ Porównajmy kody stacji:
 unique(PM10$kod) %>% .[str_detect(., "MpKrak")]  # poprzednie
 unique(PM10n$kod) %>% .[str_detect(., "MpKrak")] # jednorodne
 ```
+
+Stare kody stacji, zostały zamienione na nowe kody w pobranych danych. Teraz
+możemy przetwarzać dane
 
 ***
 

@@ -40,7 +40,7 @@ gios_metadane <- function(type = "stacje",
 
     if (download == TRUE) {
 
-      download.file(url = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/327", # weryfikować
+      download.file(url = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/405", # weryfikować
                     destfile = name, mode = mode)
     }
 
@@ -65,7 +65,7 @@ gios_metadane <- function(type = "stacje",
                                                               tz = "UTC"),
                     data.zamkniecia   = excel_numeric_to_date(date_num = data.zamkniecia,
                                                               tz = "UTC")) %>%
-      as.tbl()
+      as_tibble()
   }
 
   if (type == "stanowiska") {
@@ -76,13 +76,13 @@ gios_metadane <- function(type = "stacje",
 
     if (download == TRUE) {
 
-      download.file(url = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/327", # weryfikować
+      download.file(url = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/405", # weryfikować
                     destfile = name, mode = mode)
     }
 
     sheet = 2 ; wek1 = 1; wek2 = NULL
 
-    meta <- read.xlsx(xlsxFile =  "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/327",
+    meta <- read.xlsx(xlsxFile =  "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/405",
                       sheet = sheet,
                       colNames = T) # weryfikować
 
@@ -97,7 +97,7 @@ gios_metadane <- function(type = "stacje",
                                                               tz = "UTC"),
                     data.zamkniecia   = excel_numeric_to_date(date_num = data.zamkniecia,
                                                               tz = "UTC")) %>%
-      as.tbl()
+      as_tibble()
 
   }
 
@@ -110,7 +110,7 @@ gios_metadane <- function(type = "stacje",
 
     if (download == TRUE) {
 
-      download.file(url = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/325", # weryfikować
+      download.file(url = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/403", # weryfikować
                     destfile = name, mode = mode)
     }
 

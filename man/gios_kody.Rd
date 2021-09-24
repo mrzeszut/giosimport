@@ -2,7 +2,7 @@
 % Please edit documentation in R/gios_kody.R
 \name{gios_kody}
 \alias{gios_kody}
-\title{Korekta starych nazw stacji}
+\title{Korekta starych nazw stacji jakosci powietrza}
 \usage{
 gios_kody(data, meta)
 }

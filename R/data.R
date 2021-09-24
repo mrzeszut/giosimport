@@ -4,7 +4,7 @@
 #' @format Ramka danych zawiera:
 #' \describe{
 #'  \item{url}{adresy url}
-#'  \item{rok}{rok, którego dotyczy zestaw danych od 2010 - 2018}
+#'  \item{rok}{rok, którego dotyczy zestaw danych od 2010 - 2020}
 #' }
 #' @examples
 #' \dontrun{

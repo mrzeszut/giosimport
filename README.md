@@ -66,3 +66,28 @@ vignette("giosimport")
 # wyswietli tylko kod
 edit(vignette("giosimport"))
 ```
+
+***
+
+# UWAGA - Pakiet nie jest doskonały. 
+
+***
+
+Dobrze działa dla okresu lat 2015-2020. Natomiast w przypadku pobierania pełnej
+wersji wymaga pewnych modyfikacji pobranych plików. Po pobraniu całej bazy
+danych (2000:2020) należy, wykonać kilka korekt:
+
+* 2012 PM10 1g - nalezy dodać dodatkowy wiersz wskaźniki
+* 2012 O3   1g - nalezy dodać dodatkowy wiersz wskaźniki
+* 2012 NOx  1g - zlikwiduj pierwszy wiersz danych
+* 2012 NOx  1g - zmień nazwę substancji z "jest" na "NOx" (wiersz wskańiki)
+* 2013 Nox  1g - brakuje wiersza wskaźniki
+* 2014 NOx  1g - zmień w wierszy wskaźniki "Nox" na "NOx"
+
+Znacznie prostszym i łatwiejszym jest wykonanie tych korekt. Niestety plikowa
+baza danych gioś air nie jest jednorodna, co dostarcza wielu problemów.
+Prawdopodobnie w przyszłości te problemy zostaną rozwiązane i dopisane
+odpowiednie funkcjonalności pakietu.
+
+
+

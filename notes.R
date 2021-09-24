@@ -5,21 +5,28 @@
 library(devtools)
 use_git()
 
-zrodlo <- data.frame(link = c(paste0("http://powietrze.gios.gov.pl/pjp/archives/downloadFile/",
-                            c(223, 224, 225, 226, 202, 203, 227, 228, 229, 230,
-                              231, 232, 233, 234, 302, 236, 242, 262, 303))),
-  rok = as.character(2000:2018)) %>%
-  mutate_all(as.character)
 
 dir.create("data")
 
 save(zrodlo, file = "data/zrodlo.rda")
-load("../R/sysdata.rda")
+load("R/sysdata.rda")
+
+zrodlo <- data.frame(link = c(paste0("http://powietrze.gios.gov.pl/pjp/archives/downloadFile/",
+                                     c(223, 224, 225, 226, 202, 203, 227, 228, 229, 230,
+                                       231, 232, 233, 234, 302, 236, 242, 262, 303))),
+                     rok = as.character(2000:2018)) %>%
+  mutate_all(as.character)
+
 
 
 zrodlo <- rbind(zrodlo,
                 data.frame(link = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/322",
                            rok = as.character(2019)))
+
+zrodlo <- rbind(zrodlo,
+                data.frame(link = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/402",
+                           rok = as.character(2020)))
+
 
 save(zrodlo, file = "data/zrodlo.rda")
 ###-------------------------------------------------------------------------###
@@ -118,15 +125,17 @@ library(roxygen2)
 
 # [2.1] ------------------------------------------------------------------------------------
 
-sciezka <- "D:/4_BAZY_DANYCH/gios_airbase"
+kat_dost <- "D:/4_BAZY_DANYCH/gios_airbase"
 check()
 install()
 library(giosimport)
 # [2.1] ------------------------------------------------------------------------------------
 
 meta  <- gios_metadane(type = "stacje",  download = T, path = kat_dost, mode = "wb")
+
 stand <- gios_metadane(type = "stanowiska", download = T, path = kat_dost, mode = "wb")
-stats <- gios_metadane(type = "statystyki", download = F, path = kat_dost, mode = "wb")
+
+stats <- gios_metadane(type = "statystyki", download = T, path = kat_dost, mode = "wb")
 
 # konwertujemy nazwy kolumn
 #colnames(df) <- iconv(colnames(df), from="UTF-8", to="ASCII//TRANSLIT")
@@ -135,10 +144,13 @@ stats <- gios_metadane(type = "statystyki", download = F, path = kat_dost, mode 
 meta  <- gios_metadane(type = "meta",  download = T, path = sciezka, mode = "wb")
 
 
-pliki <- gios_download(url = zrodlo[1,1], rok = zrodlo[1,2], path = "", mode = "wb")
+pliki <- gios_download(url = zrodlo[21,1], rok = zrodlo[21,2], path = kat_dost, mode = "wb")
 
-pm10_24 <- gios_read(nazwa = pliki[5], czas_mu = "24h", path = "")
-pm10_24
+NO2_24h <- gios_read(nazwa = "2020_NO2_24g.xlsx", czas_mu = "24g", path = kat_dost)
+NO2_1h  <- gios_read(nazwa = "2020_NO2_1g.xlsx",  czas_mu = "1g",  path = kat_dost)
+
+NO2_24h
+NO2_1h
 
 # [2.1] ------------------------------------------------------------------------------------
 
@@ -229,4 +241,13 @@ PM10 %>%
 
 
 
-save(meta, identyfikacja, statystyki, stanowiska, test, pliki_2010, pliki_all, stanowiska, statystyki, pm10_2010, file = "R/sysdata.rda")
+save(meta,
+     statystyki,
+     stanowiska,
+     identyfikacja,
+     pliki_all,
+     pliki_2020, file = "R/sysdata.rda")
+
+
+check()
+install()
