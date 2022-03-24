@@ -5,7 +5,6 @@
 library(devtools)
 use_git()
 
-
 dir.create("data")
 
 save(zrodlo, file = "data/zrodlo.rda")
