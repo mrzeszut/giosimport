@@ -289,7 +289,7 @@ W obiekcie `pliki_all` znajduje sie lista plików. Dobrym pomysłem jest uzupeł
 
 
 ```{r}
-names(pliki_all) <- paste0("R",zrodlo[,2])
+names(pliki_all) <- paste0("R",zrodlo[1:21,2])
 names(pliki_all)
 pliki_all["R2016"]
 ```
@@ -348,6 +348,7 @@ PM10 <- map_df(.x = pliki_1h_pm10,
                czas_mu = "1g", 
                path = kat_dost)
 ```
+
 ```{r}
 PM10 %>% head()
 PM10 %>% tail()
