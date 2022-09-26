@@ -35,7 +35,7 @@ gios_read <- function(nazwa,
 
   # Rózne formaty plików xlsx ustawienia parametrów wczytywania
 
-  if (str_sub(nazwa, 1,4) %in% c(2016, 2017, 2018, 2019, 2020)) {
+  if (str_sub(nazwa, 1,4) %in% c(2016, 2017, 2018, 2019, 2020, 2021)) {
     startRow = 2 ; end_row = 4
   } else if (str_sub(nazwa, 1,4) %in% c(2000:2015)) {
     startRow = 1 ; end_row = 2

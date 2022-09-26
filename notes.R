@@ -3,11 +3,11 @@
 ###-------------------------------------------------------------------------###
 # Może wymagać aktualizacji.
 library(devtools)
+library(tidyverse)
 use_git()
 
 dir.create("data")
 
-save(zrodlo, file = "data/zrodlo.rda")
 load("R/sysdata.rda")
 
 zrodlo <- data.frame(link = c(paste0("http://powietrze.gios.gov.pl/pjp/archives/downloadFile/",
@@ -17,7 +17,6 @@ zrodlo <- data.frame(link = c(paste0("http://powietrze.gios.gov.pl/pjp/archives/
   mutate_all(as.character)
 
 
-
 zrodlo <- rbind(zrodlo,
                 data.frame(link = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/322",
                            rok = as.character(2019)))
@@ -25,6 +24,10 @@ zrodlo <- rbind(zrodlo,
 zrodlo <- rbind(zrodlo,
                 data.frame(link = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/402",
                            rok = as.character(2020)))
+
+zrodlo <- rbind(zrodlo,
+                data.frame(link = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/486",
+                           rok = as.character(2021)))
 
 
 save(zrodlo, file = "data/zrodlo.rda")
@@ -37,11 +40,11 @@ save(zrodlo, file = "data/zrodlo.rda")
 # Sprawdźć czy masz te programy !
 
 # Rtools
-browseURL("https://cran.r-project.org/bin/windows/Rtools/")
+# browseURL("https://cran.r-project.org/bin/windows/Rtools/")
 # Pandoc
-browseURL("https://pandoc.org/installing.html")
+# browseURL("https://pandoc.org/installing.html")
 # MiKText
-browseURL("https://miktex.org/download")
+# browseURL("https://miktex.org/download")
 
 ###-------------------------------------------------------------------------###
 # [2.2] Pakiety ---------------------------------------------------------------
@@ -70,8 +73,9 @@ library(giosimport)
 
 # CTRL+SHIFT+D, use_document
 devtools::document()
-install()
-1# dokumentowanie danych
+devtools::install()
+
+# dokumentowanie danych
 
 # tworzenie pomocniczego zestawu danych, nie wykorzystywanego w projekcie
 # utworzono je w trakcie testowania funkcji, by nie pobierać za każdym razem
@@ -125,8 +129,6 @@ library(roxygen2)
 # [2.1] ------------------------------------------------------------------------------------
 
 kat_dost <- "D:/4_BAZY_DANYCH/gios_airbase"
-check()
-install()
 library(giosimport)
 # [2.1] ------------------------------------------------------------------------------------
 
@@ -143,13 +145,15 @@ stats <- gios_metadane(type = "statystyki", download = T, path = kat_dost, mode 
 meta  <- gios_metadane(type = "meta",  download = T, path = sciezka, mode = "wb")
 
 
-pliki <- gios_download(url = zrodlo[21,1], rok = zrodlo[21,2], path = kat_dost, mode = "wb")
+pliki <- gios_download(url = zrodlo[22,1], rok = zrodlo[22,2], path = kat_dost, mode = "wb")
 
-NO2_24h <- gios_read(nazwa = "2020_NO2_24g.xlsx", czas_mu = "24g", path = kat_dost)
-NO2_1h  <- gios_read(nazwa = "2020_NO2_1g.xlsx",  czas_mu = "1g",  path = kat_dost)
+NO2_24h <- gios_read(nazwa = "2021_NO2_24g.xlsx", czas_mu = "24g", path = kat_dost)
+NO2_1h  <- gios_read(nazwa = "2021_NO2_1g.xlsx",  czas_mu = "1g",  path = kat_dost)
 
 NO2_24h
 NO2_1h
+
+gios_vis(data = meta %>% filter(is.na(data.zamkniecia)))
 
 # [2.1] ------------------------------------------------------------------------------------
 
