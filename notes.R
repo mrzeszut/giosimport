@@ -22,7 +22,7 @@ zrodlo <- rbind(zrodlo,
                            rok = as.character(2019)))
 
 zrodlo <- rbind(zrodlo,
-                data.frame(link = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/402",
+                data.frame(link = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/424",
                            rok = as.character(2020)))
 
 zrodlo <- rbind(zrodlo,
@@ -128,7 +128,7 @@ library(roxygen2)
 
 # [2.1] ------------------------------------------------------------------------------------
 
-kat_dost <- "D:/4_BAZY_DANYCH/gios_airbase"
+kat_dost <- "D:/Qnap/bazy_danych/gios_airbase/"
 library(giosimport)
 # [2.1] ------------------------------------------------------------------------------------
 
@@ -142,10 +142,10 @@ stats <- gios_metadane(type = "statystyki", download = T, path = kat_dost, mode 
 #colnames(df) <- iconv(colnames(df), from="UTF-8", to="ASCII//TRANSLIT")
 
 # [2.1] ------------------------------------------------------------------------------------
-meta  <- gios_metadane(type = "meta",  download = T, path = sciezka, mode = "wb")
+meta  <- gios_metadane(type = "meta",  download = F, path = kat_dost, mode = "wb")
 
 
-pliki <- gios_download(url = zrodlo[22,1], rok = zrodlo[22,2], path = kat_dost, mode = "wb")
+pliki <- gios_download(url = zrodlo[21,1], rok = zrodlo[21,2], path = kat_dost, mode = "wb")
 
 NO2_24h <- gios_read(nazwa = "2021_NO2_24g.xlsx", czas_mu = "24g", path = kat_dost)
 NO2_1h  <- gios_read(nazwa = "2021_NO2_1g.xlsx",  czas_mu = "1g",  path = kat_dost)
