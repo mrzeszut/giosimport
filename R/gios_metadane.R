@@ -40,7 +40,7 @@ gios_metadane <- function(type = "stacje",
 
     if (download == TRUE) {
 
-      download.file(url = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/484", # weryfikować
+      download.file(url = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/502", # weryfikować
                     destfile = name, mode = mode)
     }
 
@@ -76,13 +76,13 @@ gios_metadane <- function(type = "stacje",
 
     if (download == TRUE) {
 
-      download.file(url = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/484", # weryfikować
+      download.file(url = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/502", # weryfikować
                     destfile = name, mode = mode)
     }
 
     sheet = 2 ; wek1 = 1; wek2 = NULL
 
-    meta <- read.xlsx(xlsxFile =  "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/484",
+    meta <- read.xlsx(xlsxFile = name,
                       sheet = sheet,
                       colNames = T) # weryfikować
 
