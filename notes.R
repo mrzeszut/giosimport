@@ -7,6 +7,7 @@ library(tidyverse)
 use_git()
 
 dir.create("data")
+setwd(dir = "D:/Qnap/R/R_package/giosimport")
 
 load("R/sysdata.rda")
 
@@ -16,18 +17,15 @@ zrodlo <- data.frame(link = c(paste0("http://powietrze.gios.gov.pl/pjp/archives/
                      rok = as.character(2000:2018)) %>%
   mutate_all(as.character)
 
-
 zrodlo <- rbind(zrodlo,
                 data.frame(link = "http://powietrze.gios.gov.pl/pjp/archives/downloadFile/322",
-                           rok = as.character(2019)))
-
-zrodlo <- rbind(zrodlo,
+                           rok = as.character(2019)),
                 data.frame(link = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/424",
-                           rok = as.character(2020)))
-
-zrodlo <- rbind(zrodlo,
+                           rok = as.character(2020)),
                 data.frame(link = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/486",
-                           rok = as.character(2021)))
+                           rok = as.character(2021)),
+                data.frame(link = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/524",
+                           rok = as.character(2022)))
 
 
 save(zrodlo, file = "data/zrodlo.rda")
@@ -54,13 +52,7 @@ save(zrodlo, file = "data/zrodlo.rda")
 # install.packages("devtools") devtools::install_github("r-lib/fs")
 # devtools::install_github("r-lib/devtools")
 # devtools::install_github("r-lib/usethis")
-
-library(devtools)
-library(usethis)
-library(fs)
-library(testthat)
-library(roxygen2)
-library(giosimport)
+no
 
 ###-------------------------------------------------------------------------###
 ###---- TOOLS -> Project options -> build and tools -> ustawienie roxygen --###
@@ -82,17 +74,17 @@ devtools::install()
 # danych do stworzenia samouczka
 
 usethis::use_data(
+  zrodlo,
   meta,
-  pliki_2010,
+  pliki_2020,
   pliki_all,
   stanowiska,
   statystyki,
-  internal = T)
+  internal = T, overwrite = T)
 
 usethis::use_readme_rmd()
-
-
 devtools::install()
+
 # [2.4] Tworzenie winiet ------------------------------------------------------
 
 # nowy komponent
@@ -111,6 +103,8 @@ usethis::use_vignette("giosimport")
 # edit(vignette("giosimport"))
 
 # Testy
+
+
 
 
 # [2] Testy funkcji -----------------------------------------------------------------------------------
@@ -138,17 +132,30 @@ stand <- gios_metadane(type = "stanowiska", download = T, path = kat_dost, mode 
 
 stats <- gios_metadane(type = "statystyki", download = T, path = kat_dost, mode = "wb")
 
+usethis::use_data(
+  zrodlo,
+  meta,
+  pliki_2020,
+  pliki_all,
+  stanowiska,
+  statystyki,
+  internal = T, overwrite = T)
+
 # konwertujemy nazwy kolumn
 #colnames(df) <- iconv(colnames(df), from="UTF-8", to="ASCII//TRANSLIT")
 
 # [2.1] ------------------------------------------------------------------------------------
 meta  <- gios_metadane(type = "meta",  download = F, path = kat_dost, mode = "wb")
 
+pliki <- gios_download(url = zrodlo[23,1], rok = zrodlo[23,2], path = kat_dost, mode = "wb")
 
-pliki <- gios_download(url = zrodlo[21,1], rok = zrodlo[21,2], path = kat_dost, mode = "wb")
+NO2_24h <- gios_read(nazwa = "2022_NO2_24g.xlsx",
+                     czas_mu = "24g",
+                     path = kat_dost)
 
-NO2_24h <- gios_read(nazwa = "2021_NO2_24g.xlsx", czas_mu = "24g", path = kat_dost)
-NO2_1h  <- gios_read(nazwa = "2021_NO2_1g.xlsx",  czas_mu = "1g",  path = kat_dost)
+NO2_1h  <- gios_read(nazwa = "2022_NO2_1g.xlsx",
+                     czas_mu = "1g",
+                     path = kat_dost)
 
 NO2_24h
 NO2_1h

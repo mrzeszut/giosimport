@@ -35,7 +35,7 @@ gios_read <- function(nazwa,
 
   # Rózne formaty plików xlsx ustawienia parametrów wczytywania
 
-  if (str_sub(nazwa, 1,4) %in% c(2016, 2017, 2018, 2019, 2020, 2021)) {
+  if (str_sub(nazwa, 1,4) %in% c(2016, 2017, 2018, 2019, 2020, 2021, 2022)) {
     startRow = 2 ; end_row = 4
   } else if (str_sub(nazwa, 1,4) %in% c(2000:2015)) {
     startRow = 1 ; end_row = 2
@@ -83,7 +83,8 @@ gios_read <- function(nazwa,
            obs = round(obs, 6)) %>%     # Nazwa substancji
     .[,c("kod", "sub", "date", "obs")]
 
-  setwd(lok)                            # powrót do katalogu projektu
+  setwd(lok)
+  # powrót do katalogu projektu
 
   return(dane)
 

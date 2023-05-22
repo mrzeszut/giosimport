@@ -40,7 +40,7 @@ gios_metadane <- function(type = "stacje",
 
     if (download == TRUE) {
 
-      download.file(url = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/502", # weryfikować
+      download.file(url = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/522", # weryfikować
                     destfile = name, mode = mode)
     }
 
@@ -76,7 +76,7 @@ gios_metadane <- function(type = "stacje",
 
     if (download == TRUE) {
 
-      download.file(url = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/502", # weryfikować
+      download.file(url = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/522", # weryfikować
                     destfile = name, mode = mode)
     }
 
@@ -110,7 +110,7 @@ gios_metadane <- function(type = "stacje",
 
     if (download == TRUE) {
 
-      download.file(url = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/485", # weryfikować
+      download.file(url = "https://powietrze.gios.gov.pl/pjp/archives/downloadFile/523", # weryfikować
                     destfile = name, mode = mode)
     }
 
