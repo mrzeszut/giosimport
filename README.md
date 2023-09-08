@@ -83,13 +83,13 @@ całej bazy danych (2000:2020) należy, wykonać kilka korekt:
 -   2012 NOx 1g - zmień nazwę substancji z “jest” na “NOx” (wiersz wskaźniki)
 -   2013 Nox 1g - brakuje wiersza wskaźniki
 -   2014 NOx 1g - zmień w wierszy wskaźniki “Nox” na “NOx”
-
 -   2009 PM10 24g - usunać powtarzającą się kolumne danych "DsOlesnicaPM"
--   2020_BaP(PM10)_24g usuń niepoprawny wiersz "rok 2021"" 6 wiersz danych
 -   2005_C6H6_24g - dodać wiersz "wskaźnik C6H6" do pliku 
 -   2012_PM2.5_24g - dodać wiersz "wskaźnik PM2.5" do pliku 
 -   2012_C6H6_24g - poprawić wiersze naglowka
 -   2015_DBahA_24g - zmienić nazwe w pliku z DBah(PM10) na DBahA(PM10)  
+-   2020_BaP(PM10)_24g usuń niepoprawny wiersz "rok 2021"" 6 wiersz danych
+-   2021_BaP(PM10)_24g usuń niepoprawny wiersz "rok 2021"" 6 wiersz danych
 
 Znacznie prostszym i łatwiejszym jest wykonanie tych korekt. Niestety
 plikowa baza danych gioś air nie jest jednorodna, co dostarcza wielu
