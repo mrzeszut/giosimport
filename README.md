@@ -95,3 +95,6 @@ Znacznie prostszym i łatwiejszym jest wykonanie tych korekt. Niestety
 plikowa baza danych gioś air nie jest jednorodna, co dostarcza wielu
 problemów. Prawdopodobnie w przyszłości te problemy zostaną rozwiązane i
 dopisane odpowiednie funkcjonalności pakietu.
+
+!!! **UWaga** Aktualnie nie ma aktualizacji za rok 2024, planowane prace wrzesień 2025. 
+
